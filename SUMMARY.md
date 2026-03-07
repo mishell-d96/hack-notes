@@ -2,6 +2,10 @@
 
 * [Welcome](README.md)
 
+## Active Directory
+
+* [Checklist](active-directory/checklist.md)
+
 ## Windows pentesting
 
 * [Active Directory](windows-pentesting/active-directory.md)
