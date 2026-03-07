@@ -8,8 +8,8 @@
 
 ## Windows pentesting
 
-* [Active Directory](windows-pentesting/active-directory.md)
-* [Windows privilege escalation](windows-pentesting/windows-privilege-escalation.md)
+* [Windows Privilege escalation](windows-pentesting/windows-privilege-escalation.md)
+* [Persistence](windows-pentesting/persistence.md)
 
 ## Linux pentesting
 
