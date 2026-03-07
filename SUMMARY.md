@@ -4,10 +4,13 @@
 
 ## Windows pentesting
 
-* [Page 3](windows-pentesting/page-3.md)
+* [Active Directory](windows-pentesting/active-directory.md)
+* [Windows privilege escalation](windows-pentesting/windows-privilege-escalation.md)
 
 ## Linux pentesting
 
+* [Linux privilege escalation](linux-pentesting/linux-privilege-escalation.md)
+
 ## Web pentesting
 
-* [Page 4](web-pentesting/page-4.md)
+* [File uploads](web-pentesting/file-uploads.md)
