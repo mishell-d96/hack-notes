@@ -1,10 +1,12 @@
 # Table of contents
 
 * [Welcome](README.md)
+* [\_TEMPLATE](_template.md)
 
 ## Active Directory
 
 * [1. Checklist](active-directory/1.-checklist.md)
+* [2. Vulnerabilities](active-directory/2.-vulnerabilities.md)
 
 ## Windows pentesting
 
