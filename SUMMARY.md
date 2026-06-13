@@ -4,7 +4,7 @@
 
 ## Active Directory
 
-* [Checklist](active-directory/checklist.md)
+* [1. Checklist](active-directory/1.-checklist.md)
 
 ## Windows pentesting
 
