@@ -8,7 +8,7 @@ Kerberoasting is an Active Directory attack where any authenticated domain user 
 
 ### Exploitation
 
-Kerberoasting can be exploited with impacket or with nxc. Some examples are:
+Kerberoasting can be exploited with impacket or with nxc. Some examples are included below:
 
 ```bash
 # 1. retrieve all - KERBEROAST - able accounts from the domain
