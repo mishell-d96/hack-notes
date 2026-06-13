@@ -6,7 +6,8 @@
 ## Active Directory
 
 * [1. Checklist](active-directory/1.-checklist.md)
-* [2. Vulnerabilities](active-directory/2.-vulnerabilities.md)
+* [2. Vulnerabilities](active-directory/2.-vulnerabilities/README.md)
+  * [Kerberoasting](active-directory/2.-vulnerabilities/kerberoasting.md)
 
 ## Windows pentesting
 
