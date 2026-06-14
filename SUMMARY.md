@@ -21,7 +21,7 @@
 
 ## Linux pentesting
 
-* [Linux privilege escalation](linux-pentesting/linux-privilege-escalation.md)
+* [1. PrivEsc checklist](linux-pentesting/1.-privesc-checklist.md)
 
 ## Web pentesting
 
