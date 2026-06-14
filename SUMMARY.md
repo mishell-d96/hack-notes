@@ -5,13 +5,14 @@
 
 ## Active Directory
 
-* [1. Checklist](active-directory/1.-checklist.md)
-* [2. Vulnerabilities](active-directory/2.-vulnerabilities/README.md)
-  * [SMB relay attack](active-directory/2.-vulnerabilities/smb-relay-attack.md)
-  * [LLMNR Poisoning](active-directory/2.-vulnerabilities/llmnr-poisoning.md)
-  * [IPv6 DNS takeover](active-directory/2.-vulnerabilities/ipv6-dns-takeover.md)
-  * [Kerberoasting](active-directory/2.-vulnerabilities/kerberoasting.md)
-  * [AS-REP roasting](active-directory/2.-vulnerabilities/as-rep-roasting.md)
+* [1. AD Checklist](active-directory/1.-ad-checklist.md)
+* [2. Post-exploitation checklist](active-directory/2.-post-exploitation-checklist.md)
+* [3. Vulnerabilities](active-directory/3.-vulnerabilities/README.md)
+  * [SMB relay attack](active-directory/3.-vulnerabilities/smb-relay-attack.md)
+  * [LLMNR Poisoning](active-directory/3.-vulnerabilities/llmnr-poisoning.md)
+  * [IPv6 DNS takeover](active-directory/3.-vulnerabilities/ipv6-dns-takeover.md)
+  * [Kerberoasting](active-directory/3.-vulnerabilities/kerberoasting.md)
+  * [AS-REP roasting](active-directory/3.-vulnerabilities/as-rep-roasting.md)
 
 ## Windows pentesting
 
