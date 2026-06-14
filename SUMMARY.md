@@ -3,6 +3,10 @@
 * [Welcome](README.md)
 * [\_TEMPLATE](_template.md)
 
+## OSINT
+
+* [1. OSINT checklist](osint/1.-osint-checklist.md)
+
 ## Active Directory
 
 * [1. AD Checklist](active-directory/1.-ad-checklist.md)
