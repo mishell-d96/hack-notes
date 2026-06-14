@@ -15,7 +15,7 @@
 
 ## Windows pentesting
 
-* [Windows Privilege escalation](windows-pentesting/windows-privilege-escalation.md)
+* [1. PrivEsc checklist](windows-pentesting/1.-privesc-checklist.md)
 * [Persistence](windows-pentesting/persistence.md)
 
 ## Linux pentesting
