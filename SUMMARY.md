@@ -3,9 +3,14 @@
 * [Welcome](README.md)
 * [\_TEMPLATE](_template.md)
 
+## Services
+
+* [Page 1](services/page-1.md)
+
 ## OSINT
 
 * [1. OSINT checklist](osint/1.-osint-checklist.md)
+* [2. OSINT darkweb checklist](osint/2.-osint-darkweb-checklist.md)
 
 ## Active Directory
 
