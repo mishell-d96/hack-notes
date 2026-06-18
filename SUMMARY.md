@@ -5,7 +5,16 @@
 
 ## Services
 
-* [Page 1](services/page-1.md)
+* [X - General checks](services/x-general-checks.md)
+* [21 - FTP](services/21-ftp.md)
+* [22 - SSH](services/22-ssh.md)
+* [25, 465, 587 - SMTP](services/25-465-587-smtp.md)
+* [110, 995 - POP3](services/110-995-pop3.md)
+* [113 - IDENT](services/113-ident.md)
+* [143, 993 - IMAP](services/143-993-imap.md)
+* [161 - SNMP](services/161-snmp.md)
+* [5900 - VNC](services/5900-vnc.md)
+* [6379 - REDIS](services/6379-redis.md)
 
 ## OSINT
 
