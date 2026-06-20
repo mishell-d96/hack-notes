@@ -49,3 +49,8 @@
 * [3. Git & CMS checks](web-pentesting/3.-git-and-cms-checks.md)
 
 ## Wi-Fi pentesting
+
+***
+
+* [\_vulnerabilities](_vulnerabilities/README.md)
+  * [WPA2 handshake capture](_vulnerabilities/wpa2-handshake-capture.md)
