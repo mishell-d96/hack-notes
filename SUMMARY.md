@@ -23,14 +23,14 @@
 
 ## Active Directory
 
+* [\_vulnerabilities](active-directory/_vulnerabilities/README.md)
+  * [SMB relay attack](active-directory/_vulnerabilities/smb-relay-attack.md)
+  * [LLMNR Poisoning](active-directory/_vulnerabilities/llmnr-poisoning.md)
+  * [IPv6 DNS takeover](active-directory/_vulnerabilities/ipv6-dns-takeover.md)
+  * [Kerberoasting](active-directory/_vulnerabilities/kerberoasting.md)
+  * [AS-REP roasting](active-directory/_vulnerabilities/as-rep-roasting.md)
 * [1. AD Checklist](active-directory/1.-ad-checklist.md)
 * [2. Post-exploitation checklist](active-directory/2.-post-exploitation-checklist.md)
-* [3. Vulnerabilities](active-directory/3.-vulnerabilities/README.md)
-  * [SMB relay attack](active-directory/3.-vulnerabilities/smb-relay-attack.md)
-  * [LLMNR Poisoning](active-directory/3.-vulnerabilities/llmnr-poisoning.md)
-  * [IPv6 DNS takeover](active-directory/3.-vulnerabilities/ipv6-dns-takeover.md)
-  * [Kerberoasting](active-directory/3.-vulnerabilities/kerberoasting.md)
-  * [AS-REP roasting](active-directory/3.-vulnerabilities/as-rep-roasting.md)
 
 ## Windows pentesting
 
@@ -43,6 +43,9 @@
 
 ## Web pentesting
 
+* [\_vulnerabilities](web-pentesting/_vulnerabilities.md)
 * [1. Web checklist](web-pentesting/1.-web-checklist.md)
 * [2. Web API checklist](web-pentesting/2.-web-api-checklist.md)
 * [3. Git & CMS checks](web-pentesting/3.-git-and-cms-checks.md)
+
+## Wi-Fi pentesting
