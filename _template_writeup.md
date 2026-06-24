@@ -34,19 +34,7 @@ Short summary of the full attack chain in 2-4 sentences. Anyone should be able t
 #### 1.1 Port scan
 
 ```bash
-# Fast full TCP scan
-nmap -p- -sC -sV -sS 10.10.x.x -oN nmap/allports.txt
-
-# Service and version detection on open ports
-nmap -p <ports> -sCV 10.10.x.x -oN nmap/services.txt
-```
-
-**Open ports:**
-
-```bash
-# add open ports
-
-
+# NMAP output
 ```
 
 #### 1.2 Initial observations
@@ -148,3 +136,4 @@ Short, defensive wrap-up — useful if you ever want to convert this into pentes
 
 * \<link to HackTricks / CVE / blog post>
 * <...>
+
