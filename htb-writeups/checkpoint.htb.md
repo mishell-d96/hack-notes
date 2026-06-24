@@ -1,7 +1,5 @@
 # checkpoint.htb
 
-## checkpoint.htb
-
 > **OS:** Windows\
 > **Difficulty:** Medium\
 > **IP:** `10.10.x.x`\
@@ -322,7 +320,7 @@ drw-rw-rw-          0  Wed May 13 15:58:18 2026 ..
 # get Windows Server 2019-Snapshot1.vmem
 ```
 
-Once the 2 GB `.vmem` file is downloaded, parse it with `vmkatz` to recover the Administrator hash.
+Once the 2 GB `.vmem` file is downloaded, parse it with [`vmkatz`](https://github.com/nikaiw/VMkatz) to recover the Administrator hash.
 
 <figure><img src="../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 11.26.38.png" alt=""><figcaption></figcaption></figure>
 
