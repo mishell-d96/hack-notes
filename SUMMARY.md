@@ -1,7 +1,8 @@
 # Table of contents
 
 * [Welcome](README.md)
-* [\_TEMPLATE](_template.md)
+* [\_TEMPLATE\_writeup](_template_writeup.md)
+* [\_TEMPLATE\_VULN](_template_vuln.md)
 
 ## Services
 
@@ -50,7 +51,9 @@
 
 ## Wi-Fi pentesting
 
-***
+* [\_vulnerabilities](wi-fi-pentesting/_vulnerabilities/README.md)
+  * [WPA2 handshake capture](wi-fi-pentesting/_vulnerabilities/wpa2-handshake-capture.md)
 
-* [\_vulnerabilities](_vulnerabilities/README.md)
-  * [WPA2 handshake capture](_vulnerabilities/wpa2-handshake-capture.md)
+## HTB Writeups
+
+* [checkpoint.htb](htb-writeups/checkpoint.htb.md)
