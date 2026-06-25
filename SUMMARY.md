@@ -46,6 +46,7 @@
 
 * [\_vulnerabilities](web-pentesting/_vulnerabilities/README.md)
   * [JWT - multiple vulnerabilities](web-pentesting/_vulnerabilities/jwt-multiple-vulnerabilities.md)
+  * [MASS assignment](web-pentesting/_vulnerabilities/mass-assignment.md)
 * [1. Web checklist](web-pentesting/1.-web-checklist.md)
 * [2. Web API checklist](web-pentesting/2.-web-api-checklist.md)
 * [3. Git & CMS checks](web-pentesting/3.-git-and-cms-checks.md)
