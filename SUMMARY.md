@@ -30,6 +30,7 @@
   * [IPv6 DNS takeover](active-directory/_vulnerabilities/ipv6-dns-takeover.md)
   * [Kerberoasting](active-directory/_vulnerabilities/kerberoasting.md)
   * [AS-REP roasting](active-directory/_vulnerabilities/as-rep-roasting.md)
+  * [Certificate Vulnerabilities](active-directory/_vulnerabilities/certificate-vulnerabilities.md)
 * [1. AD Checklist](active-directory/1.-ad-checklist.md)
 * [2. Post-exploitation checklist](active-directory/2.-post-exploitation-checklist.md)
 
