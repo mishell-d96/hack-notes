@@ -41,6 +41,7 @@
 ## Linux pentesting
 
 * [1. PrivEsc checklist](linux-pentesting/1.-privesc-checklist.md)
+* [2. Persistence](linux-pentesting/2.-persistence.md)
 
 ## Web pentesting
 
