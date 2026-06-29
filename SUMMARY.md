@@ -36,7 +36,7 @@
 ## Windows pentesting
 
 * [1. PrivEsc checklist](windows-pentesting/1.-privesc-checklist.md)
-* [Persistence](windows-pentesting/persistence.md)
+* [2. Persistence](windows-pentesting/2.-persistence.md)
 
 ## Linux pentesting
 
