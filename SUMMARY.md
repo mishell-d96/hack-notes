@@ -68,5 +68,6 @@
 
 ## HTB Writeups
 
+* [Linux](htb-writeups/linux.md)
 * [enigma.htb](htb-writeups/enigma.htb.md)
 * [checkpoint.htb](htb-writeups/checkpoint.htb.md)
