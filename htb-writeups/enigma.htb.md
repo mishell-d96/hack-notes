@@ -1,4 +1,4 @@
-# \_TEMPLATE\_writeup
+# enigma.htb
 
 > **OS:** Linux\
 > **Difficulty:** Easy\

@@ -68,4 +68,5 @@
 
 ## HTB Writeups
 
+* [enigma.htb](htb-writeups/enigma.htb.md)
 * [checkpoint.htb](htb-writeups/checkpoint.htb.md)
