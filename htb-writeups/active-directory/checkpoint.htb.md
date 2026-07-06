@@ -142,7 +142,7 @@ This shows that `alex.turner` has write access to the `mark.davies` AD object an
 
 #### 2.1 Description
 
-To gain a foothold, `alex.turner` first restores the `mark.davies` AD object. `mark.davies` then uploads a malicious VSIX extension to the devdrop share and gains a local shell as `ryan.brookley`.
+> To gain a foothold, `alex.turner` first restores the `mark.davies` AD object. `mark.davies` then uploads a malicious VSIX extension to the devdrop share and gains a local shell as `ryan.brookley`.
 
 #### 2.2 Exploitation
 
@@ -216,9 +216,9 @@ a2e3da7c0d7a15b5deba60f5218dd851
 
 #### 3.1 Description
 
-To escalate privileges, use the `badsuccessor` exploit to impersonate `svc_deploy`. Use `bloody-ad` to obtain a valid TGT with the required permissions. Then access the `VMBackups` share, download the `.vmem` file, and extract the Administrator NT hash with `vmkatz`.
+> To escalate privileges, use the `badsuccessor` exploit to impersonate `svc_deploy`. Use `bloody-ad` to obtain a valid TGT with the required permissions. Then access the `VMBackups` share, download the `.vmem` file, and extract the Administrator NT hash with `vmkatz`.
 
-#### 3.1 badsuccessor enumeration
+#### 3.2 badsuccessor enumeration
 
 validate the badsuccessor possibilities with nxc ([https://github.com/Akamai/BADSUCCESSOR](https://github.com/Akamai/BADSUCCESSOR)):
 
@@ -228,7 +228,7 @@ nxc ldap 10.129.21.24 -u alex.turner -p 'Checkpoint2024!' -M badsuccessor
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 11.32.30.png" alt=""><figcaption></figcaption></figure>
 
-#### 3.2 Enumeration as ryan.brooke
+#### 3.3 Enumeration as ryan.brooke
 
 ```bash
 # 1. Generate a TGT as the user ryan.brooke utilizing rubeus.exe
@@ -270,7 +270,7 @@ After executing the bloodyAD command, a .ccache file will be generated that hold
 
 After retrieving the `.ccache` file, set `KRB5CCNAME` to that ticket. Then authenticate as `pentest_dmsa`. This account has the same permissions as `svc_deploy account`.
 
-#### 3.2 Exploitation as pentest\_dmsa
+#### 3.4 Exploitation as pentest\_dmsa
 
 ```bash
 # 1. enumerate the shares as the pentest_dmsa user
