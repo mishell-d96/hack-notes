@@ -13,7 +13,7 @@ While enumerating the NFS share, we discovered a `.pdf` file containing credenti
 
 After identifying the software version, we determined it was vulnerable to both command injection and SQL injection. Exploiting these gave us a shell as **www-data** and yielded credentials for the user **haris**. From the www-data shell, we escalated to **haris**, and eventually identified an application listening on `127.0.0.1:1337` that was vulnerable to code execution. Exploiting this granted us a **root** shell.
 
-&#x20;**Chain:**&#x20;
+**Chain:**
 
 `nfs` > `roundcube` (mail001.enigma.htb) > `OpenSTAManager` (support\_001.enigma.htb) > `www-data` > `sudo to haris` > `olivetin` > `root`
 
@@ -193,13 +193,44 @@ OS and Service detection performed. Please report any incorrect results at https
     10.10.x.x enigma.htb 
     ```
 
-#### 1.3 tool-x output
+#### 1.3 Enumerate NFS exports with showmount
 
-Run `` `tool-x` ``
+Run `showmount -e enigma.htb` to list the NFS exports available from the target. The output shows that `/srv/nfs/onboarding` is exposed and can be mounted locally.
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-06 om 15.39.43.png" alt=""><figcaption></figcaption></figure>
+
+After that, mount the NFS export to the local `mount` folder with the following command
 
 ```bash
-command
+mount -t nfs enigma.htb:/srv/nfs/onboarding mount -o nolock
 ```
+
+And notice that there is an `New_Employee_Access.pdf` file.
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-06 om 15.43.04.png" alt=""><figcaption></figcaption></figure>
+
+The contents of the .pdf file are as follows:
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-06 om 15.44.51.png" alt=""><figcaption></figcaption></figure>
+
+We then add the `mail001.enigma.htb` record to the /etc/hosts file, and continue navigating to the roundcube webapp.
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-06 om 15.46.58.png" alt=""><figcaption></figcaption></figure>
+
+Inside Roundcube, we find an email from `sarah` to Kevin. We later confirm that the password `Enigma2024!` also works for e-mail account `sarah`. After logging in as Sarah, we find the following credentials about OpenSTAManager with admin credentials.
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-06 om 15.56.55.png" alt=""><figcaption></figcaption></figure>
+
+After seeing the mail sarah recieved from IT, I updated the `/etc/hosts` file. The file is now as follows:
+
+```bash
+# HTB
+10.129.30.247 enigma enigma.htb mail001.enigma.htb support_001.enigma.htb
+```
+
+The admin credentials work on openSTAManager, and we notice that the version 2.9.8 contains 2 vulnerabilities; 1: an SQL injection, from which we retrieve the bcrypt hash of the user&#x20;
+
+
 
 ### 2. Foothold / Initial Access
 
@@ -208,8 +239,6 @@ command
 <...>
 
 #### 2.2 Exploitation
-
-
 
 ***
 
