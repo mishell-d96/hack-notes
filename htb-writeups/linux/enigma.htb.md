@@ -288,11 +288,35 @@ This results in a webshell as the user `www-data`, we then later upgrade with a 
 
 #### 3.1 Description
 
-> In order to escalate from the user haris to the user root, we have to setup an local SSH forward using the command `ssh -L 1337:127.0.0.1:1337` as the user haris. Once we can reach the Olivetin application, we can then use a set of commands used to get command execution as the user root.
+> In order to escalate from the user haris to the user root, we have to setup an local SSH forward using the command `ssh -L 1337:127.0.0.1:1337` as the user haris. Once we can reach the Olivetin application, we can then use a set of commands used to get command execution as the user root since there is no filtering in the command used.
 
 #### 3.2 Exploitaton
 
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-06 om 19.23.30.png" alt=""><figcaption></figcaption></figure>
 
+After setting up a reverse listener, we can navigate to `localhost:1337`, which shows the olivetin application.&#x20;
 
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-06 om 19.25.15.png" alt=""><figcaption></figcaption></figure>
+
+When we search for the version we find the following CVE for it [CVE-2026-27626](https://nvd.nist.gov/vuln/detail/CVE-2026-27626). According to the vulnerability page, we have the following issue at hand:
+
+> OliveTin's shell mode safety check (`checkShellArgumentSafety`) blocks several dangerous argument types but not `password`. A user supplying a `password`-typed argument can inject shell metacharacters that execute arbitrary OS commands
+
+After researching the application, we find the `Backup Database` module. When we then take a step back, and look at the predefined command in the file `/etc/OliveTin/config.yaml` we find the following:
+
+```bash
+aris@enigma:/etc/OliveTin$ cat config.yaml | grep -i mysql                                                          │
+    shell: "mysqldump -u {{ db_user }} -p'{{ db_pass }}' {{ db_name }} > /opt/backups/backup.sql"                    │
+haris@enigma:/etc/OliveTin$ pwd                                                                                      │
+/etc/OliveTin
 ```
+
+Our command, from the frontend, is injected as the `{{ db_pass }}` parameter, from which we can escape using the following payload:
+
+```bash
+'; id; echo '
 ```
+
+This results in command execution as the user `root`
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-06 om 19.37.47.png" alt=""><figcaption></figcaption></figure>
