@@ -55,7 +55,7 @@ command
 
 #### 2.1 Description
 
-<...>
+> ...
 
 #### 2.2 Exploitation
 
@@ -67,7 +67,7 @@ command
 
 #### 3.1 Description
 
-<...>
+>
 
 ```
 ```
