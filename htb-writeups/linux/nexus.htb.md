@@ -8,28 +8,32 @@
 >
 > **Date:** 03-07-2026
 
-​
-
 ***
 
 ### TL;DR <a href="#tl-dr" id="tl-dr"></a>
 
-<...>
+Enumerate `nexus.htb` and its subdomains to find a public Git repository and a Krayin billing application. An earlier Git commit exposes a password. Use it with `j.matthew@nexus.htb` to access Krayin.
 
-**Chain:**&#x200B;
+Exploit Krayin's remote code execution vulnerability to gain a shell as `www-data`. Filesystem enumeration reveals credentials for `jones`, which provide SSH access.
+
+The root-owned `template-sync.py` script runs every minute. Create a malicious repository to exploit its template-synchronization flaw and add an SSH key for `root`.
+
+**Chain:**
+
+`Domain enum` > `subdomain enum` > `git repo password` + `krayin billing app` > `login as j.matthew` > `krayin RCE` > `shell as www-data` > `cred hunt on filesystem` > `SSH as jones` > `find root cronjob template-sync.py` > `exploit via malicious repo to add root SSH key` > `root`​
 
 ***
 
 ### Box Info <a href="#box-info" id="box-info"></a>
 
-| **Name**       | nexus.htb                   |
-| -------------- | --------------------------- |
-| **OS**         | Linux                       |
-| **Difficulty** | Easy                        |
-| **Release**    | Released on 23th June, 2026 |
-| **Key skills** |                             |
+| **Name**       | nexus.htb                                               |
+| -------------- | ------------------------------------------------------- |
+| **OS**         | Linux                                                   |
+| **Difficulty** | Easy                                                    |
+| **Release**    | Released on 23th June, 2026                             |
+| **Key skills** | subdomain enum, git, CVE, cred hunt, abuse cron job git |
 
-​
+
 
 ***
 
@@ -168,11 +172,11 @@ We then use the exploit to first login, and then upload the php webshell. Once w
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-18 om 14.10.10.png" alt=""><figcaption></figcaption></figure>
 
-After some research, we find a .env file with another password within the krayin folder `/var/www/krayin` and abuse this in order to login as the user `jones` :&#x20;
+After some research, we find a .env file with another password within the krayin folder `/var/www/krayin` and abuse this in order to login as the user `jones` :
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-18 om 14.16.15.png" alt=""><figcaption></figcaption></figure>
 
-We can then login to the app with the combination: `jones:y27xb3ha!!74GbR`&#x20;
+We can then login to the app with the combination: `jones:y27xb3ha!!74GbR`
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-07-18 om 14.18.18.png" alt=""><figcaption></figcaption></figure>
 
