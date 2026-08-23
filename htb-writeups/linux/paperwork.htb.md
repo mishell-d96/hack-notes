@@ -9,11 +9,11 @@
 
 ### TL;DR
 
-<...>
+Browsing to port 80 reveals _Digital Archiving Solutions v1.0.2_. A command-injection CVE for that version gives RCE as the service account `lp`. Enumerating locally, we find a print service on `localhost:9100` run by the user `archivist`; abusing it (via jetdirect.py) lets us write a new `authorized_keys` into `/home/archivist/.ssh/`, so we SSH in as the user `archivist`. From there, enumerating `/etc/systemd/system` reveals `paperwork.service`, which runs `/usr/bin/paperwork-daemon` behind the management socket `/run/paperwork/mgmt.sock` that only the user `archivist` can access; leveraging that socket escalates us to `root`.
 
 **Chain:**
 
-`<...>`
+DAS v1.0.2 (:80) -> command injection -> lp → :9100 print service-> jetdirect.py writes authorized\_keys -> SSH as archivist -> paperwork mgmt.sock (/run/paperwork/mgmt.sock) -> root
 
 ***
 
