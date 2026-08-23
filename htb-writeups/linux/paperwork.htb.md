@@ -213,6 +213,118 @@ Upload your ssh key to the .ssh directory of the user archivist on the following
 
 #### 3.1 Description
 
-> In order to escalate from the user \<USER> to the user root,
+> To escalate from `archivist` to `root`, enumerate the services in `/etc/systemd/system`. The `paperwork.service` unit runs `/usr/bin/paperwork-daemon`, which uses `/run/paperwork/mgmt.sock`. Only `archivist` can connect to this management socket. The overwritten `authorized_keys` file provides the required SSH access as `archivist`.
 
 #### 3.2 Exploitaton
+
+As `archivist`, enumerate the units in `/etc/systemd/system`. The `paperwork.service` unit runs `/usr/bin/paperwork-daemon`, which connects to `/run/paperwork/mgmt.sock`.
+
+Inspect `/usr/bin/paperwork-daemon`:
+
+```python
+# /usr/bin/paperwork-daemon file
+#!/usr/bin/python3
+import socket, os, array, hashlib
+import zipfile
+import shutil
+
+try:
+    admin_fd = os.open("/etc/paperwork/admin_pins.conf", os.O_RDONLY)
+except Exception:
+    os._exit(1)
+
+LOG_PATH = "/home/archivist/printer/logs/commands.log"
+
+def get_admin_secret():
+    data = os.pread(admin_fd, 1024, 0).decode().strip()
+    if "ADMIN_PASSWORD=" in data:
+        return data.split("ADMIN_PASSWORD=")[1].split("\n")[0]
+    return data
+
+def scan_for_malice():
+    if not os.path.exists(LOG_PATH):
+        return False
+    with open(LOG_PATH, 'r') as f:
+        content = f.read().upper()
+        if any(trigger in content for trigger in ["FSQUERY", "FSUPLOAD", "FSDOWNLOAD"]):
+            return True
+    return False
+
+def trigger_lockdown(conn):
+    try:
+        log_fd = os.open(LOG_PATH, os.O_RDONLY)
+        evidence_bundle = array.array("i", [log_fd, admin_fd])
+        msg = b"ALERT: SECURITY_VIOLATION. FORENSIC_CONTEXT_ATTACHED."
+        conn.sendmsg([msg], [(socket.SOL_SOCKET, socket.SCM_RIGHTS, evidence_bundle)])
+
+        zip_path = "/root/quarantine/evidence.zip"
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            zipf.write(LOG_PATH, arcname="commands.log")
+
+
+        with open(LOG_PATH, 'w') as f:
+            f.truncate(0)
+
+        os.close(log_fd)
+    except:
+        pass
+
+def main():
+    socket_path = "/run/paperwork/mgmt.sock"
+    if os.path.exists(socket_path): os.remove(socket_path)
+    if not os.path.exists("/run/paperwork"): os.makedirs("/run/paperwork")
+
+    s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    s.bind(socket_path)
+    os.chmod(socket_path, 0o660)
+    os.chown(socket_path, 0, 1000)
+    s.listen(5)
+
+    while True:
+        conn, _ = s.accept()
+        
+        # if scan_for_malice is triggered, then 
+        if scan_for_malice():
+            trigger_lockdown(conn)
+        else:
+            secret = get_admin_secret()
+            token = hashlib.sha256(f"SYSTEM_CLEAN:{secret}".encode()).hexdigest()
+            conn.sendall(f"STATUS: SYSTEM_CLEAN\nSIGNATURE: {token}\n".encode())
+
+        conn.close()
+
+if __name__ == "__main__":
+    main()
+```
+
+Within this script, a bug resides. The bug is found in the `trigger_lockdown` function, a step-by-step explanation can be found here:
+
+> **1. Setup.** On startup, the daemon opens the admin credentials file (`admin_pins.conf`) and retains an open file descriptor to it for the lifetime of the process.
+>
+> **2. Connection.** The daemon listens on a Unix socket and waits for a client to connect
+>
+> **3. Inspection.** For each connection, it scans the command log for suspicious keywords (`FSUPLOAD`, `FSDOWNLOAD`, `FSQUERY`).
+>
+> **4a. No keywords found (clean path).** The daemon returns a SHA-256 hash of the admin password. This is safe by design - the hash is not reversible, so the credential is not exposed.
+>
+> **4b. Keywords found ("lockdown" path).** The daemon appears to initiate an incident response: it emits a `SECURITY_VIOLATION` alert, archives the log into a "quarantine" zip, and truncates the original log file.
+>
+> **5. The actual leak.** Within that same lockdown routine, the daemon uses `SCM_RIGHTS` to pass the client an open file descriptor to the credentials file. Critically, this transmits a _live, readable handle_ to the file - not merely a text message.
+>
+> **6. Exploitation.** The client reads directly through the received descriptor and recovers the plaintext admin password.
+
+**Summary of the vulnerability.** The logic is inverted from what an auditor would expect: the "clean" path safeguards the credential, while the "alarm" path discloses it. The leak is concealed by design - the visible message only reads `ALERT: SECURITY_VIOLATION`, and the defensive naming (`trigger_lockdown`, `evidence_bundle`, `FORENSIC_CONTEXT_ATTACHED`) frames exfiltration as incident response. Because the credential is passed as a file descriptor rather than written into the message body, a review that inspects only the payload text — or greps for where the password is copied into a buffer - will miss it entirely.
+
+***
+
+**Practical**: after updating the authorized\_keys file, we should be able to connect to the socket in the "lockdown path", and by that viewing the administrator password. We'll utilize the following script to do that:
+
+{% file src="../../.gitbook/assets/socket_tmp.py" %}
+
+We then run the `socket_tmp.py` file, select the `/run/paperwork/mgmt.sock` as option, an we read the administrator password. This will result in the following:
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-08-23 om 16.08.20.png" alt=""><figcaption></figcaption></figure>
+
+And after trying, we can login as the user `root` and have privileges over the entire box.
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-08-23 om 16.09.54.png" alt=""><figcaption></figcaption></figure>
