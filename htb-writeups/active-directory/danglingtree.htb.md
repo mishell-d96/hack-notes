@@ -115,7 +115,7 @@ When opening the .PDF file, we find credentials of the user anderson.w and can c
 
 #### 2.1 Description
 
-> ...
+> Guest SMB share leaks a PDF with anderson.w's credentials. Windows Admin Center on 6600 gives RCE as that user. Pivot to SmarterMail (17017), exploit CVE-2026-24423 for svc\_mail, decrypt noah.b's 3DES password, DPAPI-loot alex.o, ForceChangePassword on jake.h
 
 #### 2.2 Exploitation
 
@@ -245,10 +245,6 @@ bloodyAD --host '10.129.68.2' -d 'danglingtree.htb' -u 'alex.o' -p 'SunsetMounta
 Once the force change password has happened, we run certipy. It can be seen that there is a ESC7 vulnerability present in the environment.
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 14.31.13.png" alt=""><figcaption></figcaption></figure>
-
-In addition, I can login with RDP a retrieve the `user.txt` flag
-
-
 
 ### 3. Privilege Escalation
 
