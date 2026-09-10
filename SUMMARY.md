@@ -74,4 +74,5 @@
   * [paperwork.htb](htb-writeups/linux/paperwork.htb.md)
 * [Windows](htb-writeups/windows.md)
 * [Active directory](htb-writeups/active-directory/README.md)
+  * [danglingtree.htb](htb-writeups/active-directory/danglingtree.htb.md)
   * [checkpoint.htb](htb-writeups/active-directory/checkpoint.htb.md)
