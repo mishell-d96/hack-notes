@@ -1,6 +1,6 @@
 # danglingtree.htb
 
-> <img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 13.51.10 (1).png" alt="" data-size="original">
+>
 >
 > **OS:** Windows\
 > **Difficulty:** Medium\
@@ -11,9 +11,11 @@
 
 ### TL;DR
 
-<...>
+Guest SMB share leaks a PDF with anderson.w's credentials. Windows Admin Center on 6600 gives RCE as that user. Pivot to SmarterMail (17017), exploit CVE-2026-24423 for svc\_mail, decrypt noah.b's 3DES password, DPAPI-loot alex.o, ForceChangePassword on jake.h, then ESC7 for domain escalation.
 
 **Chain:**&#x20;
+
+SMB share > pdf > anderson.w > windows admin center RCE > smartermail RCE > decrypt password > dpapi loot > forcechangepassword > ESC7 using custom scripts
 
 ***
 
