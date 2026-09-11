@@ -21,13 +21,13 @@ SMB share > pdf > anderson.w > windows admin center RCE > smartermail RCE > decr
 
 ### Box Info
 
-|                |                              |
-| -------------- | ---------------------------- |
-| **Name**       | danglingtree.htb             |
-| **OS**         | Windows                      |
-| **Difficulty** | Medium                       |
-| **Release**    | Released on 8th August, 2026 |
-| **Key skills** |                              |
+|                |                                         |
+| -------------- | --------------------------------------- |
+| **Name**       | danglingtree.htb                        |
+| **OS**         | Windows                                 |
+| **Difficulty** | Medium                                  |
+| **Release**    | Released on 8th August, 2026            |
+| **Key skills** | CVE's, decrypting of a DES password, CA |
 
 ***
 
