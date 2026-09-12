@@ -69,6 +69,7 @@
 ## HTB Writeups
 
 * [Linux](htb-writeups/linux/README.md)
+  * [variatype.htb](htb-writeups/linux/variatype.htb.md)
   * [enigma.htb](htb-writeups/linux/enigma.htb.md)
   * [nexus.htb](htb-writeups/linux/nexus.htb.md)
   * [paperwork.htb](htb-writeups/linux/paperwork.htb.md)
