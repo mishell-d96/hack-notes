@@ -86,13 +86,13 @@ We try these credentials on `portal.variatype.htb` and successfully log in to th
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-12 om 11.22.28.png" alt=""><figcaption></figcaption></figure>
 
-After logging in, we find the uploaded `.ttf` file and the option to either view or download it. When we try to download the file using `....//` to escape the `../` filter (so that a normal `../` remains after filtering), we find that we can read system files, such as `/etc/passwd`.
+After logging in, we find the uploaded `.ttf` file and the option to either view or download it. When we try to download `/etc/passwd`, we start using `....//` to escape the `../` filter (so that a normal `../` remains after filtering). This way, we find that we can read multiple different system files, such as `/etc/passwd`.
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-27 om 09.00.35.png" alt=""><figcaption></figcaption></figure>
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-12 om 11.33.58.png" alt=""><figcaption></figcaption></figure>
 
-We first try reading the `/etc/nginx/nginx.conf` file. From there, we try to read the document roots of the `variatype.htb` and `portal.variatype.htb` sites.
+We first try reading the `/etc/nginx/nginx.conf` file. From there, we try to read the document roots of the `variatype.htb` and `portal.variatype.htb` sites (since these can be found in `nginx.conf`).
 
 ```bash
 /download.php?f=....//....//....//....//....//....//etc/nginx/nginx.conf
@@ -103,17 +103,13 @@ Upload
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-26 om 10.13.09.png" alt=""><figcaption></figcaption></figure>
 
-
-
-<...>
+We then upload the file (`temp.php`) with the content that was generated from `setup.py` into the `.ttf` file. This ultimately results in a web shell running as the user `www-data`, as can be seen in the screenshot below.
 
 ```
 http://portal.variatype.htb/files/temp.php?0=whoami
 ```
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-26 om 10.11.49.png" alt=""><figcaption></figcaption></figure>
-
-<...>
 
 ***
 
