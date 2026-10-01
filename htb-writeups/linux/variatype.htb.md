@@ -9,9 +9,13 @@
 
 ### TL;DR
 
-<...>
+Nmap found SSH and an nginx site (`variatype.htb`). `ffuf` revealed the subdomain `portal.variatype.htb` and `feroxbuster` an exposed `.git` directory; after dumping it with `git-dumper`, the commit history leaked the credentials `gitbot:G1tB0t_Acc3ss_2025!`. Logging into the portal, a path traversal in `download.php` (bypassed via `....//`) allowed reading system files, after which a malicious `.ttf` containing a PHP web shell was uploaded - getting RCE as `www-data`.
+
+**Privilege Escalation:** As `www-data`, `pspy` revealed a cron job running the `fontforge` binary, vulnerable to a pickle deserialization RCE (CVE-2025-15276). A crafted `.sfd` file with a malicious `PickledData` payload triggered a reverse shell as `steve`, made persistent by adding an SSH key to his `authorized_keys`. From `steve`, `sudo -l` showed permission to run `install_validator.py` as root; abusing a setuptools behaviour (via a crafted directory structure containing `.ssh/authorized_keys`) planted a root-authorized key — yielding full root access.
 
 **Chain:**&#x20;
+
+`nmap` > `ffuf` > `git-dumper` > `creds` > `path traversal` > `font webshell` > `www-data` > `fontforge pickle RCE` > `steve` > `sudo setuptools` > `root`
 
 ***
 
@@ -62,7 +66,7 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
 #### 2.1 Description
 
-> ...
+> Nmap found SSH and an nginx site (`variatype.htb`). `ffuf` revealed the subdomain `portal.variatype.htb` and `feroxbuster` an exposed `.git` directory; after dumping it with `git-dumper`, the commit history leaked the credentials `gitbot:G1tB0t_Acc3ss_2025!`. Logging into the portal, a path traversal in `download.php` (bypassed via `....//`) allowed reading system files, after which a malicious `.ttf` containing a PHP web shell was uploaded — yielding RCE as `www-data`.
 
 #### 2.2 Exploitation
 
@@ -117,7 +121,11 @@ http://portal.variatype.htb/files/temp.php?0=whoami
 
 #### 3.1 Description
 
->
+> As `www-data`, `pspy` revealed a cron job running the `fontforge` binary, vulnerable to a pickle deserialization RCE (CVE-2025-15276). A malicious `.sfd` file with a crafted `PickledData` payload triggered a reverse shell as `steve`, which was made persistent by adding an SSH key to `/home/steve/.ssh/authorized_keys`. From `steve`, `sudo -l` showed permission to run `install_validator.py` as root; abusing a setuptools behaviour (via a crafted directory structure containing `.ssh/authorized_keys`) planted a root-authorized key — yielding root access.
+
+**www-data to steve**
+
+After getting a shell as the user `www-data`, we ran pspy32s. This showed us that a script was running that ran the `/usr/local/src/fontforge/build/bin/fontforge` binary. After looking up possible exploits of the fontforge binary ([https://www.cvedetails.com/cve/CVE-2025-15276/](https://www.cvedetails.com/cve/CVE-2025-15276/)) we found a deserialization RCE. We adjust the payload to our own custom SSH payload
 
 [CVE-2025-15276](https://github.com/ahmedreda38/CVE-2025-15276-poc)
 
@@ -163,26 +171,20 @@ print(f"[+] Payload: {cmd}")
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-26 om 15.31.33.png" alt=""><figcaption></figcaption></figure>
 
-**www-data to steve**
-
-
-
-<...>
-
-add ssh key
+And once the cron job triggers, we get a reverse shell using fahrj reverse ssh binary. To make things easier we run it once more, but then to add our own SSH key to the user steve
 
 ```bash
 # add the public key to the authorized_keys file of the user steve
 mkdir -p /home/steve/.ssh; echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIlqtAaJS4g3B0Ou72g0C8aTnP7aYxJ+ycryhcvlWWbl root@kali" > /home/steve/.ssh/authorized_keys
 ```
 
+**Steve to root**
 
-
-Steve to root
-
-
+In order to go from the user steve to root, we find that we're able to run the `install_validator.py` binary by executing `sudo -l`
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-09-26 om 14.25.20.png" alt=""><figcaption></figcaption></figure>
+
+In order to exploit this, we create a directory structure on the attacker host. We create the folder root, then within root we create .ssh, then within .ssh we create the authorized\_keys file that contains the public key.
 
 [https://github.com/pypa/setuptools/issues/4946](https://github.com/pypa/setuptools/issues/4946)
 
