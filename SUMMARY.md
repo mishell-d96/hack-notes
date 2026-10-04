@@ -73,6 +73,7 @@
   * [enigma.htb](htb-writeups/linux/enigma.htb.md)
   * [nexus.htb](htb-writeups/linux/nexus.htb.md)
   * [paperwork.htb](htb-writeups/linux/paperwork.htb.md)
+  * [layover.htb](htb-writeups/linux/layover.htb.md)
 * [Windows](htb-writeups/windows.md)
 * [Active directory](htb-writeups/active-directory/README.md)
   * [danglingtree.htb](htb-writeups/active-directory/danglingtree.htb.md)
