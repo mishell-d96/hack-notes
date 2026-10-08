@@ -164,10 +164,10 @@ echo $password;
 
 <...>
 
-
-
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-10-03 om 17.14.54.png" alt=""><figcaption></figcaption></figure>
 
+<...>
 
+<figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-10-08 om 15.38.12.png" alt=""><figcaption></figcaption></figure>
 
 <...>
