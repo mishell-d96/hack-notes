@@ -9,9 +9,15 @@
 
 ### TL;DR
 
-<...>
+The initial foothold chains a wireless attack with a web vulnerability. After connecting to `layover.htb` via RDP as `contractor`, one wireless interface joins the open HTB Airport Wi-Fi while another monitors channel 6. Because the portal login is sent over plain HTTP, `jenny`’s credentials are captured in Wireshark. A ligolo-ng pivot into 10.13.37.0/24 exposes `portal.international.htb`, where these credentials grant access to Craft CMS 5.9.8. The entries index’s `filters` parameter is vulnerable to Twig template injection (CVE-2026-31857), allowing authenticated remote code execution via `filter('system')`.
+
+Privilege escalation proceeds in two steps. As `www-data`, the Craft CMS `.env` file in `/var/www/portal` reveals database credentials and the application’s security key. Querying the custom `htbairways_settings` table in MySQL yields an encrypted mail relay password, which is decrypted with Craft’s `decryptByKey()` using that key. Because the password is reused, it grants access to the user `aporter`. Enumerating running services then reveals CUPS v2.4.16, which is vulnerable to a local privilege escalation (CVE-2026-34990). Exploiting it with a public proof of concept results in root access.
 
 **Chain:**&#x20;
+
+```
+TODO
+```
 
 ***
 
@@ -61,7 +67,7 @@ PORT     STATE SERVICE       REASON         VERSION
 
 #### 2.1 Description
 
->
+> The initial foothold chains a wireless attack with a web vulnerability. After connecting to `layover.htb` via RDP as `contractor`, one wireless interface joins the open HTB Airport Wi-Fi while another monitors channel 6. Because the portal login is sent over plain HTTP, `jenny`’s credentials are captured in Wireshark. A ligolo-ng pivot into 10.13.37.0/24 exposes `portal.international.htb`, where these credentials grant access to Craft CMS 5.9.8. The entries index’s `filters` parameter is vulnerable to Twig template injection (CVE-2026-31857), allowing authenticated remote code execution via `filter('system')`.
 
 #### 2.2 Exploitation
 
@@ -139,28 +145,25 @@ With that, you have an authenticated code execution vulnerability, succesfully e
 
 #### 3.1 Description
 
->
+> Privilege escalation proceeds in two steps. As `www-data`, the Craft CMS `.env` file in `/var/www/portal` reveals database credentials and the application’s security key. Querying the custom `htbairways_settings` table in MySQL yields an encrypted mail relay password, which is decrypted with Craft’s `decryptByKey()` using that key. Because the password is reused, it grants access to the user `aporter`. Enumerating running services then reveals CUPS v2.4.16, which is vulnerable to a local privilege escalation (CVE-2026-34990). Exploiting it with a public proof of concept results in root access.
 
-```
-```
-
-
+***
 
 > www-data to aporter
 
-find the .env file > continue to privesc
+First find the environment file, this `.env` file can be found in `/var/www/portal/.env`  note the credentials found here of the database user (`craftuser:CraftDB_pw_2026`).&#x20;
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-10-03 om 15.09.41.png" alt=""><figcaption></figcaption></figure>
 
-<...>
+After that, log in to the MySQL instance and execute a SELECT query on the custom `htbairways_settings` table. This provides the encrypted password for the mail relay server.
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-10-04 om 10.58.37.png" alt=""><figcaption></figcaption></figure>
 
-<...>
+Find out where it is being used (extra context)
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-10-04 om 10.59.56.png" alt=""><figcaption></figcaption></figure>
 
-<...>
+Then, create a script to decrypt the password. In the script below, the first value (starting with `u0E70...`) is the encrypted mail relay password, and the second value (starting with `IGcki...`) is the security key, which can be found in the `.env` file.
 
 ```php
 <?php
@@ -174,20 +177,20 @@ echo $password;
 ?>
 ```
 
-<...>
+This results in the password: `SkyP0rt_Relay!26`
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-10-04 om 11.02.37.png" alt=""><figcaption></figcaption></figure>
 
-<...>
+And by using this, we can succesfully login on the user `aporter`.
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-10-04 om 11.03.09.png" alt=""><figcaption></figcaption></figure>
 
-<...>
+Next, we check out what other software is running (note: this also works as the user `www-data`). We find that an additional service named CUPS v2.4.16 is running.
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-10-03 om 17.14.54.png" alt=""><figcaption></figcaption></figure>
 
-<...>
+We then use the local privesc script for cups: [https://github.com/predyy/CVE-2026-34990](https://github.com/predyy/CVE-2026-34990)
 
 <figure><img src="../../.gitbook/assets/Scherm­afbeelding 2026-10-08 om 15.38.12.png" alt=""><figcaption></figcaption></figure>
 
-<...>
+Which grants us root access
